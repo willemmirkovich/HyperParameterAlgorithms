@@ -1,2 +1,3 @@
-# HyperParameterAlgorithms
-Python library that provides algorithms to find hyper-parameters for ML problems
+# Genetic Algorithm
+
+This is a genetic algorithm function for python
