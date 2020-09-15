@@ -1,0 +1,1 @@
+from .GeneticAlgorithm import genetic_algorithm

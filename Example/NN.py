@@ -2,24 +2,25 @@ from tensorflow.keras import layers, models, Sequential
 
 class NN:
 
-    def __init__(self, shape):
-        self.shape = shape
+    def __init__(self, input_shape):
+        self.input_shape = input_shape
+        self.parameter_choices = [
+            {},
+            {},
+            {}
+        ]
         self.args = None
         self.model = None
 
 
     def generate_random_model(self):
-        args = []
-        # TODO for each arg that you modify append to the list
+        parameters = None
 
-        self.args = args
+        self.generate_model(parameters)
 
+    def generate_model(self, parameters):
+        self.parameters = parameters
 
-
-    def generate_model(self, args):
-        None
-
-        self.args = args
 
     def fit(self, X_train, Y_train, X_valid, Y_valid, epochs):
         self.model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_valid, Y_valid))

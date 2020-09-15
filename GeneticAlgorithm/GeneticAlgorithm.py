@@ -8,7 +8,7 @@ from .helpers import weighted_probability_choice, find_min
 def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
                       size=50, generations=3, mutation_probability=.1, epochs=30, fitness_function=None):
 
-    shape = X_train[0].shape
+    input_shape = X_train[0].shape
 
     choose_function = weighted_probability_choice
 
@@ -16,8 +16,9 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
 
     # init population
     p = Population(size)
+
     for _ in size:
-        member = model(shape)
+        member = model(input_shape)
         member.generate_random_model()
         idx = p.add(member)
         # TODO compile this before I think
@@ -25,8 +26,8 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
         fitness = member.evaluate(X_test, Y_test)
         p.set_fitness(idx, fitness)
 
-    # TODO minimize/maximize
 
+    # TODO plot performance over each generation
     for _ in generations:
 
         temp = Population(size)
@@ -39,7 +40,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
             p_one, p_two = p.get_member(idx_one), p.get_member(idx_two)
 
             # create new member based on parents
-            member = model()
+            member = model(input_shape)
             args = get_args(p_one, p_two, mutation_probability)
             member.generate_model(args)
             idx = temp.add(member)
