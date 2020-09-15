@@ -1,3 +1,5 @@
-# Genetic Algorithm
+# Hyper Parameter Algorithms
 
-This is a genetic algorithm function for python
+This project aims to provide algorithms to automate the hyper parameter choosing process for machine learning problems.
+
+## Genetic Algorithm
