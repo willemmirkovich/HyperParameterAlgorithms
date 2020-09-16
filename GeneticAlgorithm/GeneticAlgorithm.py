@@ -17,23 +17,22 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
     # init population
     p = Population(size)
 
-    for _ in size:
+    for _ in range(size):
         member = model(input_shape)
         member.generate_random_model()
         idx = p.add(member)
-        # TODO compile this before I think
         member.fit(X_train, Y_train, X_valid, Y_valid, epochs)
         fitness = member.evaluate(X_test, Y_test)
         p.set_fitness(idx, fitness)
 
 
     # TODO plot performance over each generation
-    for _ in generations:
+    for _ in range(generations):
 
         temp = Population(size)
 
         # TODO possilby parameterize? can't tell yet with tf optimizations
-        for _ in size:
+        for _ in range(size):
 
             # pick 2 members based on method of selection
             idx_one, idx_two = choose_function(p)
@@ -41,10 +40,9 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
 
             # create new member based on parents
             member = model(input_shape)
-            args = get_args(p_one, p_two, mutation_probability)
-            member.generate_model(args)
+            parameters = get_parameters(p_one, p_two, mutation_probability)
+            member.generate_model(parameters)
             idx = temp.add(member)
-            # TODO possibly compile
             member.fit(X_train, Y_train, X_valid, Y_valid, epochs)
             fitness = member.evaluate(X_test, Y_test)
             temp.set_fitness(idx, fitness)
@@ -64,14 +62,14 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
     return p.get_member(idx)
     # for debug, can return whole population
 
-def get_args(p_one, p_two, mutation_probability):
-    r = len(p_one.arg_choices)
+def get_parameters(p_one, p_two, mutation_probability):
+    r = len(p_one.parameter_choices)
     split = np.random.randint(0, r)
-    p_one_args = p_one.args[:split]
-    p_two_args = p_two.args[split:]
-    args = p_one_args + p_two_args
+    p_one_parameters = p_one.parameters[:split]
+    p_two_parameters = p_two.parameters[split:]
+    parameters = p_one_parameters + p_two_parameters
     mutate = np.random.choice([True, False], p=[mutation_probability, 1-mutation_probability])
     if mutate:
-        idx = np.random.choice(list(range(len(args))))
-        args[idx] = np.random.choice(p_one.arg_choices[idx]['values'])
-    return args
+        idx = np.random.choice(list(range(len(parameters))))
+        parameters[idx] = np.random.choice(p_one.parameter_choices[idx]['values'])
+    return parameters

@@ -5,10 +5,10 @@ def generate_xy(num_samples, board_dim, tile_dim):
     X, Y = [], []
     for _ in range(num_samples):
         s = Sudoku(board_dimension=board_dim, tile_dimension=tile_dim)
-        val = s.create_empty_entries()
-        X.append(s.board)
-        Y.append(np.array([val]))
-    return X, Y
+        Y.append(s.get_board_image())
+        s.create_empty_entries()
+        X.append(s.get_board_image())
+    return np.array(X), np.array(Y)
 
 def generate_data(num_train, num_valid, num_test, board_dim=3, tile_dim=3):
     X_train, Y_train = generate_xy(num_train, board_dim, tile_dim)

@@ -3,6 +3,8 @@ import numpy as np
 # TODO move this to its own git page
 class Sudoku:
 
+
+    # TODO change data structure to image for simplicity
     def __init__(self, board_dimension=1, tile_dimension=3):
         self.b_dim=board_dimension
         self.t_dim=tile_dimension
@@ -59,3 +61,18 @@ class Sudoku:
         value = self.board[i][j][k][l]
         self.board[i][j][k][l] = 0
         return value
+
+    def get_board_image(self):
+        # image[height][width] = value
+        return self.board.reshape(self.b_dim * self.t_dim, self.b_dim * self.t_dim, 1)
+
+    # should get rid of this
+    def load_from_image(self, image):
+        # TODO DO NOT HARDCODE
+        board = self.generate_board()
+        for i in range(len(board)):
+            for j in range(len(board[i])):
+                for k in range(len(board[i][j])):
+                    for l in range(len(board[i][j][k])):
+                        board[i][j][k][l] = image[i+k][j+l]
+        self.board = board
