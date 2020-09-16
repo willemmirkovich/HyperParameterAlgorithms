@@ -3,76 +3,134 @@ import numpy as np
 # TODO move this to its own git page
 class Sudoku:
 
+    def __init__(self, dimension=2):
+        # TODO refactor code to comply with simple dimension argument
+        self.b_dim=dimension
+        self.t_dim=dimension
+        self.board=self.__generate_board()
+        self.__create_valid_game()
 
-    # TODO change data structure to image for simplicity
-    def __init__(self, board_dimension=1, tile_dimension=3):
-        self.b_dim=board_dimension
-        self.t_dim=tile_dimension
-        self.board=self.generate_board()
-        self.create_valid_game()
-
-    def generate_board(self):
+    def __generate_board(self):
         board = []
-        for _ in range(self.b_dim):
+        for _ in range(self.b_dim*self.t_dim):
             temp = []
-            for _ in range(self.b_dim):
-                temp.append(np.zeros((self.t_dim, self.t_dim)))
+            for _ in range(self.b_dim*self.t_dim):
+                temp.append(0)
             board.append(temp)
         return np.array(board)
 
-    def create_valid_game(self):
+    def __create_valid_game(self):
+        # fill diags
+        '''
+        for i in range(self.b_dim):
+                self.__fill_square(i * self.t_dim, i * self.t_dim)
+        '''
+
+        # next, fill remaining
+        '''
         for i in range(self.b_dim):
             for j in range(self.b_dim):
-                r = self.t_dim ** 2
-                # possible values for tiles
-                nums = list(range(1, (r + 1)))
-                # randomize each square on the board
-                choices = []
-                for x in range(0, self.t_dim):
-                    for y in range(0, self.t_dim):
-                        choices.append([x, y])
-                choices = np.array(choices)
-                np.random.shuffle(choices)
-                choices = list(choices)
-                for k in range(len(choices)):
-                    self.board[i][j][choices[k][0]][choices[k][1]] = nums[k]
+                self.__fill_square(i * self.t_dim, j * self.t_dim, check=True)
+        '''
+        self.solve()
+
+    # please dont be dumb
+
+    def solve(self):
+        grid = self.board.copy()
+        res, sol = self.__rec_solve(grid)
+        self.board = sol
+
+    def __is_full(self, grid):
+        for row in range(len(self.board)):
+            for col in range(len(self.board)):
+                if grid[row][col] == 0:
+                    return False
+        return True
+
+    def __rec_solve(self, grid):
+        if self.__is_full(grid):
+            return True, grid
+        vals = range(1, len(self.board) + 1)
+        for row in range(len(self.board)):
+            for col in range(len(self.board)):
+                if grid[row][col] == 0:
+                    vals = list(np.random.choice(vals, size=len(vals), replace=False))
+                    while True:
+                        if len(vals) != 0:
+                            val = vals.pop()
+                            temp = grid.copy()
+                            temp[row][col] = val
+                            print((row-(row % self.t_dim)))
+                            print((col-(col % self.t_dim)))
+                            if self.__check_col(temp, col) \
+                                    and self.__check_row(temp, row)\
+                                    and self.__check_square(temp, (row-(row % self.t_dim)), (col-(col % self.t_dim))):
+                                res, sol = self.__rec_solve(temp)
+                                if res:
+                                    return True, sol
+                        else:
+                            return False, None
+
+    def __check_square(self, grid, start_row, start_col):
+        used = []
+        for row in range(self.t_dim):
+            for col in range(self.t_dim):
+                val = grid[start_row+row][start_col+col]
+                if val == 0:
+                    continue
+                if val in used:
+                    return False
+                used.append(val)
+        return True
+
+    def __check_row(self, grid, row):
+        used = []
+        for col in range(len(self.board[row])):
+            val = grid[row][col]
+            if val == 0:
+                continue
+            if val in used:
+                return False
+            used.append(val)
+        return True
+
+    def __check_col(self, grid, col):
+        used = []
+        for row in range(len(self.board)):
+            val = grid[row][col]
+            if val == 0:
+                continue
+            if val in used:
+                return False
+            used.append(val)
+        return True
+
+    # may be helpful for ml problems
+    def __is_unique(self):
+        None
 
     def print(self):
-        for cut in range(self.b_dim):
-            for row in range(self.t_dim):
-                # begin line
-                text = ''
-                text += '| '
-                for line in range(self.b_dim):
-                    for col in range(self.t_dim):
-                        text += str(int(self.board[cut][line][row][col])) + ' '
+        for row in range(len(self.board)):
+            text = ''
+            text += '| '
+            for col in range(len(self.board[row])):
+                text += str(int(self.board[row][col])) + ' '
+                if col % self.t_dim == (self.t_dim - 1):
                     text += '| '
-                # end line
-                print(text)
-                count = len(text)
-            print(count*'-')
+            print(text)
+            count = len(text)
+            if row % self.t_dim == (self.t_dim - 1):
+                print(count*'-')
 
     def create_empty_entries(self, num_entries=1):
-        # TODO support more than one
-        i = np.random.randint(0, self.b_dim)
-        j = np.random.randint(0, self.b_dim)
-        k = np.random.randint(0, self.t_dim)
-        l = np.random.randint(0, self.t_dim)
-        value = self.board[i][j][k][l]
-        self.board[i][j][k][l] = 0
-        return value
+        # TODO
+        None
 
     def get_board_image(self):
         # image[height][width] = value
-        return self.board.reshape(self.b_dim * self.t_dim, self.b_dim * self.t_dim, 1)
+        return self.board
 
     # should get rid of this
     def load_from_image(self, image):
-        # TODO DO NOT HARDCODE
-        board = self.generate_board()
-        for i in range(len(board)):
-            for j in range(len(board[i])):
-                for k in range(len(board[i][j])):
-                    for l in range(len(board[i][j][k])):
-                        board[i][j][k][l] = image[i+k][j+l]
-        self.board = board
+        self.board = image
