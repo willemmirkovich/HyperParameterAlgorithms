@@ -13,7 +13,6 @@ def weighted_probability_choice(population):
         new_total += probs[i]
     for i in range(len(probs)):
         probs[i] = probs[i]/new_total
-    print(sum(probs))
     choices = choice(list(range(population.size)), size=2, p=probs)
     return choices[0], choices[1]
 

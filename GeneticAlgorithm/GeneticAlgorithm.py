@@ -1,5 +1,7 @@
 import numpy as np
 
+from tqdm import tqdm
+
 from .Population import Population
 from .helpers import weighted_probability_choice, find_min
 
@@ -8,6 +10,8 @@ from .helpers import weighted_probability_choice, find_min
 def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
                       size=50, generations=3, mutation_probability=.1, epochs=30, fitness_function=None):
 
+    model(0)
+    # TODO make more generic for all use
     input_shape = X_train[0].shape
 
     choose_function = weighted_probability_choice
@@ -17,7 +21,8 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
     # init population
     p = Population(size)
 
-    for _ in range(size):
+    print('Generating Initial Population')
+    for _ in tqdm(range(size)):
         member = model(input_shape)
         member.generate_random_model()
         idx = p.add(member)
@@ -27,12 +32,15 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
 
 
     # TODO plot performance over each generation
-    for _ in range(generations):
+    for g in range(generations):
+        print('\n')
+        print('Generation ' + g + '\n')
+
 
         temp = Population(size)
 
         # TODO possilby parameterize? can't tell yet with tf optimizations
-        for _ in range(size):
+        for _ in tqdm(range(size)):
 
             # pick 2 members based on method of selection
             idx_one, idx_two = choose_function(p)

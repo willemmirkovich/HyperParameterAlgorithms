@@ -1,45 +1,64 @@
 import numpy as np
 
-# TODO move this to its own git page
 class Sudoku:
 
     def __init__(self, dimension=2):
-        # TODO refactor code to comply with simple dimension argument
-        self.b_dim=dimension
-        self.t_dim=dimension
+        self.dimension=dimension
         self.board=self.__generate_board()
         self.__create_valid_game()
-
-    def __generate_board(self):
-        board = []
-        for _ in range(self.b_dim*self.t_dim):
-            temp = []
-            for _ in range(self.b_dim*self.t_dim):
-                temp.append(0)
-            board.append(temp)
-        return np.array(board)
-
-    def __create_valid_game(self):
-        # fill diags
-        '''
-        for i in range(self.b_dim):
-                self.__fill_square(i * self.t_dim, i * self.t_dim)
-        '''
-
-        # next, fill remaining
-        '''
-        for i in range(self.b_dim):
-            for j in range(self.b_dim):
-                self.__fill_square(i * self.t_dim, j * self.t_dim, check=True)
-        '''
-        self.solve()
-
-    # please dont be dumb
 
     def solve(self):
         grid = self.board.copy()
         res, sol = self.__rec_solve(grid)
         self.board = sol
+
+    def print(self):
+        for row in range(len(self.board)):
+            text = ''
+            text += '| '
+            for col in range(len(self.board[row])):
+                text += str(int(self.board[row][col])) + ' '
+                if col % self.dimension == (self.dimension - 1):
+                    text += '| '
+            print(text)
+            count = len(text)
+            if row % self.dimension == (self.dimension - 1):
+                print(count*'-')
+
+    def create_empty_entries(self, num_entries=1):
+        sol = self.__generate_board()
+        idx = list(range(self.dimension * self.dimension))
+        choices = []
+        while len(choices) != num_entries:
+            choice = [np.random.choice(idx), np.random.choice(idx)]
+            if choice not in choices:
+                choices.append(choice)
+        for choice in choices:
+            sol[choice[0]][choice[1]] = self.board[choice[0]][choice[1]]
+            self.board[choice[0]][choice[1]] = 0
+        return sol
+
+    def get_board_image(self):
+        # image[height][width] = value
+        return self.board.reshape(self.dimension * self.dimension,
+                                  self.dimension * self.dimension, 1)
+
+    # should get rid of this
+    def load_from_image(self, image):
+        self.board = image.reshape(self.dimension * self.dimension,
+                                   self.dimension * self.dimension)
+
+    def __generate_board(self):
+        board = []
+        for _ in range(self.dimension*self.dimension):
+            temp = []
+            for _ in range(self.dimension*self.dimension):
+                temp.append(0)
+            board.append(temp)
+        return np.array(board)
+
+    def __create_valid_game(self):
+        self.solve()
 
     def __is_full(self, grid):
         for row in range(len(self.board)):
@@ -61,11 +80,9 @@ class Sudoku:
                             val = vals.pop()
                             temp = grid.copy()
                             temp[row][col] = val
-                            print((row-(row % self.t_dim)))
-                            print((col-(col % self.t_dim)))
                             if self.__check_col(temp, col) \
                                     and self.__check_row(temp, row)\
-                                    and self.__check_square(temp, (row-(row % self.t_dim)), (col-(col % self.t_dim))):
+                                    and self.__check_square(temp, (row-(row % self.dimension)), (col-(col % self.dimension))):
                                 res, sol = self.__rec_solve(temp)
                                 if res:
                                     return True, sol
@@ -74,8 +91,8 @@ class Sudoku:
 
     def __check_square(self, grid, start_row, start_col):
         used = []
-        for row in range(self.t_dim):
-            for col in range(self.t_dim):
+        for row in range(self.dimension):
+            for col in range(self.dimension):
                 val = grid[start_row+row][start_col+col]
                 if val == 0:
                     continue
@@ -106,31 +123,6 @@ class Sudoku:
             used.append(val)
         return True
 
-    # may be helpful for ml problems
+    # TODO may be helpful for ml problems
     def __is_unique(self):
         None
-
-    def print(self):
-        for row in range(len(self.board)):
-            text = ''
-            text += '| '
-            for col in range(len(self.board[row])):
-                text += str(int(self.board[row][col])) + ' '
-                if col % self.t_dim == (self.t_dim - 1):
-                    text += '| '
-            print(text)
-            count = len(text)
-            if row % self.t_dim == (self.t_dim - 1):
-                print(count*'-')
-
-    def create_empty_entries(self, num_entries=1):
-        # TODO
-        None
-
-    def get_board_image(self):
-        # image[height][width] = value
-        return self.board
-
-    # should get rid of this
-    def load_from_image(self, image):
-        self.board = image
