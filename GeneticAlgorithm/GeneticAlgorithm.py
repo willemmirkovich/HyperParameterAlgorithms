@@ -34,7 +34,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
     # TODO plot performance over each generation
     for g in range(generations):
         print('\n')
-        print('Generation ' + g + '\n')
+        print('Generation ' + str(g) + '\n')
 
 
         temp = Population(size)
