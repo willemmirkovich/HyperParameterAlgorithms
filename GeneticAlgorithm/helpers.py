@@ -19,3 +19,8 @@ def weighted_probability_choice(population):
 def find_min(curr_min, value):
     if value < curr_min:
         return value
+
+def plot_avg_fitness(fitness_history):
+    None
+
+# TODO add method here to plot some history stats

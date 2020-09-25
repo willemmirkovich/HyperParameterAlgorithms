@@ -50,14 +50,15 @@ class NN:
         self.model.add(layers.Conv2DTranspose(self.parameters[0], (self.parameters[1], self.parameters[1])))
         self.model.add(layers.Dense(self.parameters[4]))
         self.model.add(layers.Dense(1, activation='relu'))
-        self.model.compile(loss='mse', optimizer='adam')
+        self.model.compile(loss='mean_squared_logarithmic_error', optimizer='adam')
 
 
     def fit(self, X_train, Y_train, X_valid, Y_valid, epochs):
-        self.model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_valid, Y_valid), verbose=0)
+        return self.model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_valid, Y_valid), verbose=0)
 
     def evaluate(self, X_test, Y_test):
-        return self.model.evaluate(X_test, Y_test, verbose=0)
+        results = self.model.evaluate(X_test, Y_test, verbose=0)
+        return results
 
     def save(self):
         self.model.save('./saved_models')

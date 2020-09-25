@@ -2,14 +2,13 @@ from GeneticAlgorithm import genetic_algorithm
 from Example.generate_data import generate_data
 from Example.sudoku import Sudoku
 from Example.NN import NN
-import time
 
-X_train, Y_train, X_valid, Y_valid, X_test, Y_test = generate_data(200, 50, 50, dimension=3)
+# TODO another example brute force
 
-start = time.time()
+X_train, Y_train, X_valid, Y_valid, X_test, Y_test = generate_data(500, 150, 150, dimension=3)
+
 best_candidate = genetic_algorithm(NN, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
-                                   epochs=50, generations=3, size=30)
-print((time.time() - start) / 1000)
+                                   epochs=50, generations=3, size=50, track_performance=True)
 
 best_candidate.save()
 
