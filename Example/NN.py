@@ -54,11 +54,13 @@ class NN:
 
 
     def fit(self, X_train, Y_train, X_valid, Y_valid, epochs):
-        return self.model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_valid, Y_valid), verbose=0)
+        history = self.model.fit(X_train, Y_train, epochs=epochs, validation_data=(X_valid, Y_valid), verbose=0)
+        metric = 1 # TODO: need to figure out what to do with this data
+        return history
 
     def evaluate(self, X_test, Y_test):
-        results = self.model.evaluate(X_test, Y_test, verbose=0)
-        return results
+        test_loss = self.model.evaluate(X_test, Y_test, verbose=0)
+        return test_loss
 
     def save(self):
         self.model.save('./saved_models')

@@ -23,4 +23,8 @@ def find_min(curr_min, value):
 def plot_avg_fitness(fitness_history):
     None
 
+def equal_weight_fitnesss(validation_loss, test_loss):
+    # TODO: need to fix this to include validation loss as well
+    return test_loss
+
 # TODO add method here to plot some history stats
