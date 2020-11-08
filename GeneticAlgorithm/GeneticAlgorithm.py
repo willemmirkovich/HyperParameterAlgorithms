@@ -54,8 +54,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
         g_num = g + 1
         print('\n')
         print('Generation ' + str(g_num) + '\n')
-        generation_history.append([])
-        fitness_history.append([])
+        history.append([])
 
         temp = Population(size)
 
