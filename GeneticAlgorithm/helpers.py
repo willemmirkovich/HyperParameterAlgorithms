@@ -23,4 +23,7 @@ def find_min(curr_min, value):
 def plot_avg_fitness(fitness_history):
     None
 
+def test_and_valid_even(validation_loss, test_loss):
+    return (.5(validation_loss) + .5(test_loss))
+
 # TODO add method here to plot some history stats
