@@ -5,21 +5,21 @@ from tqdm import tqdm
 from time import perf_counter
 
 from .Population import Population
-from .helpers import weighted_probability_choice, find_min, test_and_valid_even
+from .helpers import weighted_probability_choice, find_min, equal_weight_fitness
 
-# TODO crete better name than Model
-# TODO maybe just pas x_train, y_train and give a validation split func
+# TODO: crete better name than Model
+# TODO: maybe just pas x_train, y_train and give a validation split func
 def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
-                      size=50, generations=3, mutation_probability=.1, epochs=30,
-                      fitness_function=test_and_valid_even,
-                      find_candidate_function=find_min, track_performance=False):
+                      size=50, generations=3, mutation_probability=.1, epochs=30, 
+                      selection_function=find_min, fitness_function=equal_weight_fitness, 
+                      track_performance=False):
 
     if track_performance:
         start = perf_counter()
 
     input_shape = X_train[0].shape
 
-    # TODO parameterize
+    # TODO: parameterize
     choose_function = weighted_probability_choice
 
     history = []
@@ -30,6 +30,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
 
     print('Generating Initial Population, 0')
     for _ in tqdm(range(size)):
+        member_stats = {}
         member = model(input_shape)
         member.generate_random_model()
         idx = p.add(member)
@@ -54,7 +55,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
 
         temp = Population(size)
 
-        # TODO possilby parameterize? can't tell yet with tf optimizations
+        # TODO: possilby parameterize? can't tell yet with tf optimizations
         for _ in tqdm(range(size)):
 
             # pick 2 members based on method of selection
@@ -66,7 +67,6 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
             parameters = get_parameters(p_one, p_two, mutation_probability)
             member.generate_model(parameters)
             idx = temp.add(member)
-
             fit_history = member.fit(X_train, Y_train, X_valid, Y_valid, epochs)
             v_loss = fit_history.history['val_loss'][-1] # TODO for now grabbing last one is fine, need more refined way in future
             t_loss = member.evaluate(X_test, Y_test)
@@ -86,7 +86,7 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
     curr_value = p.get_fitness(0)
     idx = 0
     for i in range(p.size):
-        value = find_candidate_function(curr_value, p.get_fitness(i))
+        value = selection_function(curr_value, p.get_fitness(i))
         if (value != curr_value):
             idx = i
 
@@ -104,7 +104,6 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
         print('Execution time: {}{}'.format(t, unit))
 
     return p.get_member(idx), history
-    # for debug, can return whole population
 
 def get_parameters(p_one, p_two, mutation_probability):
     r = len(p_one.parameter_choices)
