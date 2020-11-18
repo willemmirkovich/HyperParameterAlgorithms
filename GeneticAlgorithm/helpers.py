@@ -7,6 +7,10 @@ def weighted_probability_choice(population):
         fitness = population.get_fitness(i)
         probs.append(fitness)
         total += fitness
+    max_v = max(probs)
+    min_v = min(probs)
+    for i in range(len(probs)):
+        probs[i] = max_v + min_v - probs[i]
     new_total = 0
     for i in range(len(probs)):
         probs[i] = probs[i]/total
@@ -24,6 +28,7 @@ def plot_avg_fitness(fitness_history):
     None
 
 def test_and_valid_even(validation_loss, test_loss):
-    return (.5(validation_loss) + .5(test_loss))
+    # TODO actually do this
+    return test_loss
 
 # TODO add method here to plot some history stats

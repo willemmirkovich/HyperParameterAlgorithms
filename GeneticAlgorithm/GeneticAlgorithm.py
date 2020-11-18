@@ -8,7 +8,6 @@ from .Population import Population
 from .helpers import weighted_probability_choice, find_min, test_and_valid_even
 
 # TODO crete better name than Model
-# TODO better name for fitness function
 # TODO maybe just pas x_train, y_train and give a validation split func
 def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
                       size=50, generations=3, mutation_probability=.1, epochs=30,
@@ -35,14 +34,14 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
         member.generate_random_model()
         idx = p.add(member)
         fit_history = member.fit(X_train, Y_train, X_valid, Y_valid, epochs)
-        v_loss = 0 # TODO:
+        v_loss = fit_history.history['val_loss'][-1]  # TODO for now grabbing last one is fine, need more refined way in future
         t_loss = member.evaluate(X_test, Y_test)
         fitness = fitness_function(v_loss, t_loss)
         history[0].append({
             "validation_loss": v_loss,
             "test_loss": t_loss,
             "fitness": fitness,
-            "fit_history": fit_history
+            "fit_history": fit_history.history
         })
         p.set_fitness(idx, fitness)
 
@@ -69,14 +68,14 @@ def genetic_algorithm(model, X_train, Y_train, X_valid, Y_valid, X_test, Y_test,
             idx = temp.add(member)
 
             fit_history = member.fit(X_train, Y_train, X_valid, Y_valid, epochs)
-            v_loss = 0  # TODO:
+            v_loss = fit_history.history['val_loss'][-1] # TODO for now grabbing last one is fine, need more refined way in future
             t_loss = member.evaluate(X_test, Y_test)
             fitness = fitness_function(v_loss, t_loss)
             history[g_num].append({
                 "validation_loss": v_loss,
                 "test_loss": t_loss,
                 "fitness": fitness,
-                "fit_history": fit_history
+                "fit_history": fit_history.history
             })
 
             temp.set_fitness(idx, fitness)
